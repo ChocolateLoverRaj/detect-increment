@@ -1,10 +1,5 @@
 name: GitHub Action
 description: Outputs a capitalized string of whatever the input string is.
-inputs:
-  str:
-    description: Any string
-    required: true
-    default: Banana
 outputs:
   str:
     description: The input string capitalized
