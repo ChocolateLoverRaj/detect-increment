@@ -2,15 +2,41 @@ import { spawn } from 'child_process'
 import streamToString from 'stream-to-string'
 import { once } from 'events'
 import { EOL } from 'os'
+import { join } from 'path'
+import { writeFile } from 'jsonfile'
+import defaults from 'object.defaults'
 
-const testGhAction = async (file: string, inputs: Record<string, string> = {}): Promise<Record<string, string>> => {
+interface Result {
+  outputs: Record<string, string>
+  stdout: string
+}
+
+interface Commit {
+  message: string
+}
+
+interface Event {
+  commits: Commit[]
+}
+
+interface Options {
+  inputs: Record<string, string>
+  event: Event
+}
+
+const testGhAction = async (file: string, partialOptions: Partial<Options> = {}): Promise<Result> => {
+  const options: Options = defaults(partialOptions, { inputs: [], event: { commits: [] } })
+  const { event, inputs } = options
+  const eventFile = join(__dirname, '../test-tmp/event.json')
+  await writeFile(eventFile, event, { spaces: 2 })
   const c = spawn('node', [file], {
     env: {
       ...process.env,
+      GITHUB_EVENT_PATH: eventFile,
       ...Object.fromEntries(Object.entries(inputs).map(([k, v]) => [`INPUT_${k.toUpperCase()}`, v]))
     }
   })
-  const stdoutStr = streamToString(c.stdout)
+  const stdoutStrPromise = streamToString(c.stdout)
   const stderrStr = streamToString(c.stderr)
   const [code] = await once(c, 'exit')
   if (code !== 0) {
@@ -21,18 +47,22 @@ const testGhAction = async (file: string, inputs: Record<string, string> = {}): 
     )
   }
   const setOutputStr = '::set-output name='
-  return Object.fromEntries((await stdoutStr)
-    .split(EOL)
-    .map(str => {
-      if (str.startsWith(setOutputStr)) {
-        const keyValue = str.slice(setOutputStr.length).split('::')
-        if (keyValue.length !== 2) throw new Error('Bad set output syntax')
-        return keyValue
-      }
-      return undefined
-    })
-    .filter(v => v !== undefined) as any
-  )
+  const stdoutStr = (await stdoutStrPromise)
+  return {
+    outputs: Object.fromEntries(stdoutStr
+      .split(EOL)
+      .map(str => {
+        if (str.startsWith(setOutputStr)) {
+          const keyValue = str.slice(setOutputStr.length).split('::')
+          if (keyValue.length !== 2) throw new Error('Bad set output syntax')
+          return keyValue
+        }
+        return undefined
+      })
+      .filter(v => v !== undefined) as any
+    ),
+    stdout: stdoutStr
+  }
 }
 
 export default testGhAction
