@@ -9,8 +9,6 @@
     "strictNullChecks": true,
     "importHelpers": true,
     "module": "CommonJS",
-    "lib": [
-      "ES2019"
-    ]
+    "target": "ES2019"
   }
 }
