@@ -44,7 +44,8 @@ import diff from 'arr-diff'
   const labels = (event.pull_request.labels as Array<{ name: string}>)
     .map(({ name }) => name)
     .filter(name => incrementLabels.includes(name))
-  console.log(`Current increment labels: ${labels.join(', ')}`)
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  console.log(`Current increment labels: ${labels.join(', ') || '*none*'}`)
   const desiredLabel = getLabelName(increment)
   const desiredLabels = [desiredLabel]
   console.log(`Desired increment label: ${desiredLabel}`)
