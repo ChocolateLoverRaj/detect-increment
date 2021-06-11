@@ -3,15 +3,24 @@
 exports[`invalid commit message 1`] = `
 [Error: Process exited with code 1
 Stderr is below:
-Error: Invalid Commit Message: made it better. parse-commit-message: expect \`commit\` to follow:
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer]
-    at C:\\Users\\rajas\\Documents\\GitHub\\pr-increment-preview\\dist\\index.js:34:19
-    at Array.map (<anonymous>)
-    at C:\\Users\\rajas\\Documents\\GitHub\\pr-increment-preview\\dist\\index.js:27:51
-    at processTicksAndRejections (internal/process/task_queues.js:93:5)
+Invalid Commit Message: made it better
+Messages should follow: <type>[optional scope]: <description>
 ]
+`;
+
+exports[`works 1`] = `
+"Fetching 4 commits.
+Parsing commit messages
+Message: Feature: add triangles. Increment: minor.
+Message: Breaking: replaced triangle with polygon. Increment: major.
+Message: Fix: polygons have minimum of 3 sides. Increment: patch.
+Message: Chore: updated GitHub action script. Increment: none.
+Largest increment: major
+Updating pull request labels
+Current increment labels: Semver Increment: Minor, Semver Increment: Patch
+Desired increment label: Semver Increment: Major
+Adding labels: Semver Increment: Major.
+Removing labels: Semver Increment: Minor, Semver Increment: Patch.
+Done!
+"
 `;

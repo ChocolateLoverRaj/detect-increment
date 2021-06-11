@@ -18,8 +18,13 @@ interface Commit {
   message: string
 }
 
+interface Label {
+  name: string
+}
+
 interface PullRequest {
   commits: Commit[]
+  labels: Label[]
 }
 
 interface Repo {
@@ -57,11 +62,28 @@ const testGhAction = async (file: string, partialOptions: Partial<Options> = {})
     res.json(pr.commits.map(commit => ({ commit })))
   })
 
+  server.post('/repos/ChocolateLoverRaj/test-semver/issues/:number/labels', express.json(), (req, res) => {
+    const pr = repo.pullRequests[parseInt(req.params.number)]
+    if (pr === undefined) return res.sendStatus(404)
+    pr.labels.push(...(req.body.labels as string[]).map(name => ({ name })))
+    res.end()
+  })
+
+  server.delete('/repos/ChocolateLoverRaj/test-semver/issues/:number/labels/:name', express.json(), (req, res) => {
+    const pr = repo.pullRequests[parseInt(req.params.number)]
+    if (pr === undefined) return res.sendStatus(404)
+    const labelIndex = pr.labels.findIndex(({ name }) => name === req.params.name)
+    if (labelIndex === -1) return res.sendStatus(404)
+    pr.labels.splice(labelIndex, 1)
+    res.end()
+  })
+
   await Promise.all([
     writeFile(eventFile, {
       pull_request: {
         commits: repo.pullRequests[event.number].commits.length,
-        number: event.number
+        number: event.number,
+        labels: repo.pullRequests[event.number].labels
       },
       repository: {
         name: 'test-semver',
