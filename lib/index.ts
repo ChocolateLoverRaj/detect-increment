@@ -24,11 +24,15 @@ type Increment = typeof increments[number]
   })
   console.log('Parsing commit messages')
   const increment = increments[Math.max(...data.map(({ commit: { message } }) => {
-    const { increment } = applyPlugins(plugins[1], parse(message))[0] as {
-      increment: Increment | false
+    const messageHeader = message.split('\n')[0]
+    let increment: Increment | false
+    try {
+      increment = applyPlugins(plugins[1], parse(message))[0].increment
+    } catch (e) {
+      throw new Error(`Invalid Commit Message: ${messageHeader}. ${(e as Error).message}`)
     }
     console.log(
-      `Message: ${message.split('\n')[0]}. ` +
+      `Message: ${messageHeader}. ` +
       `Increment: ${increment === false ? 'none' : increment}.`)
     return increment === false ? -1 : increments.indexOf(increment)
   }))]

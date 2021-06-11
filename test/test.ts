@@ -28,3 +28,22 @@ test('works', async () => {
   })
   console.log(stdout)
 })
+
+test('invalid commit message', async () => {
+  await expect(testGhAction(join(__dirname, '../dist/index.js'), {
+    event: {
+      number: 1
+    },
+    repo: {
+      pullRequests: {
+        1: {
+          commits: [{ message: 'made it better' }]
+        }
+      },
+      token: 'token'
+    },
+    env: {
+      GITHUB_TOKEN: 'token'
+    }
+  })).rejects.toMatchSnapshot()
+})

@@ -2,7 +2,10 @@
   "$schema": "https://json.schemastore.org/eslintrc",
   "root": true,
   "extends": "standard-with-typescript",
-  "ignorePatterns": "/dist",
+  "ignorePatterns": [
+    "/dist",
+    "**/__snapshots__"
+  ],
   "parserOptions": {
     "project": "./eslintTsconfig.json"
   }

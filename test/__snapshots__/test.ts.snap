@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`invalid commit message 1`] = `
+[Error: Process exited with code 1
+Stderr is below:
+Error: Invalid Commit Message: made it better. parse-commit-message: expect \`commit\` to follow:
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer]
+    at C:\\Users\\rajas\\Documents\\GitHub\\pr-increment-preview\\dist\\index.js:34:19
+    at Array.map (<anonymous>)
+    at C:\\Users\\rajas\\Documents\\GitHub\\pr-increment-preview\\dist\\index.js:27:51
+    at processTicksAndRejections (internal/process/task_queues.js:93:5)
+]
+`;
