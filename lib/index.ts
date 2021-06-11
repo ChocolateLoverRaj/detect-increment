@@ -3,7 +3,7 @@ import never from 'never'
 import { parse, plugins, applyPlugins } from 'parse-commit-message'
 import { getOctokit } from '@actions/github'
 import {} from '@octokit/types'
-const increments = ['patch', 'minor', 'major'] as const
+const increments = ['none', 'patch', 'minor', 'major'] as const
 type Increment = typeof increments[number]
 
 (async () => {
@@ -34,7 +34,7 @@ type Increment = typeof increments[number]
     console.log(
       `Message: ${messageHeader}. ` +
       `Increment: ${increment === false ? 'none' : increment}.`)
-    return increment === false ? -1 : increments.indexOf(increment)
+    return increment === false ? 0 : increments.indexOf(increment)
   }))]
   console.log(`Largest increment: ${increment}`)
 })()
