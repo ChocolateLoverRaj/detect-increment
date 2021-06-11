@@ -37,6 +37,9 @@ type Increment = typeof increments[number]
     return increment === false ? 0 : increments.indexOf(increment)
   }))]
   console.log(`Largest increment: ${increment}`)
+  console.log('Updating pull request labels')
+  console.log(`Current increment labels: ${event.pull_request.labels as string}`)
+  console.log(event.pull_request.labels)
 })()
   .catch(e => {
     console.error(e)
