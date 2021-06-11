@@ -63,7 +63,7 @@ const testGhAction = async (file: string, partialOptions: Partial<Options> = {})
         commits: repo.pullRequests[event.number].commits.length,
         number: event.number
       },
-      repo: {
+      repository: {
         name: 'test-semver',
         owner: {
           login: 'ChocolateLoverRaj'

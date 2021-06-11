@@ -18,8 +18,8 @@ type Increment = typeof increments[number]
   }
   console.log(`Fetching ${event.pull_request.commits as number} commits.`)
   const { data } = await octokit.rest.pulls.listCommits({
-    repo: event.repo.name,
-    owner: event.repo.owner.login,
+    repo: event.repository.name,
+    owner: event.repository.owner.login,
     pull_number: event.pull_request.number
   })
   console.log('Parsing commit messages')
