@@ -7,22 +7,25 @@ import increments, { Increment } from './increments'
 import { setOutput } from '@actions/core'
 
 (async () => {
-  const octokit = getOctokit(process.env.GITHUB_TOKEN ?? never('No GITHUB_TOKEN'), {
-    baseUrl: process.env.GITHUB_API_URL
-  })
   const eventFile = process.env.GITHUB_EVENT_PATH ?? never('No GITHUB_EVENT_PATH')
   const event = readFileSync(eventFile)
-  if (event.pull_request === undefined) {
-    throw new Error('Cannot run on non pull request events.')
+  let commits: Array<{ commit: { message: string} }>
+  if (event.commits !== undefined) commits = event.commits
+  else if (event.pull_request !== undefined) {
+    const octokit = getOctokit(process.env.GITHUB_TOKEN ?? never('No GITHUB_TOKEN'), {
+      baseUrl: process.env.GITHUB_API_URL
+    })
+    console.log(`Fetching ${event.pull_request.commits as number} commits.`)
+    commits = (await octokit.rest.pulls.listCommits({
+      repo: event.repository.name,
+      owner: event.repository.owner.login,
+      pull_number: event.pull_request.number
+    })).data
+  } else {
+    throw new Error('Cannot get commits for this event')
   }
-  console.log(`Fetching ${event.pull_request.commits as number} commits.`)
-  const { data } = await octokit.rest.pulls.listCommits({
-    repo: event.repository.name,
-    owner: event.repository.owner.login,
-    pull_number: event.pull_request.number
-  })
   console.log('Parsing commit messages')
-  const increment = increments[Math.max(...data.map(({ commit: { message } }) => {
+  const increment = increments[Math.max(...commits.map(({ commit: { message } }) => {
     const messageHeader = message.split('\n')[0]
     let increment: Increment | false
     try {

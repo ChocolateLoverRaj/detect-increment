@@ -3,8 +3,10 @@ import { join } from 'path'
 import PullRequest from '../../test-lib/PullRequest'
 import assignSame from '../../test-lib/assignSame'
 
+const mainFilePath = join(__dirname, '../../dist/index.js')
+
 test('pull request', async () => {
-  const { stdout, outputs } = await testGhAction(join(__dirname, '../../dist/index.js'), {
+  const { stdout, outputs } = await testGhAction(mainFilePath, {
     event: {
       number: 1
     },
@@ -30,6 +32,20 @@ test('pull request', async () => {
   })
   expect(stdout).toMatchSnapshot()
   expect(outputs.increment).toBe('major')
+})
+
+test('push', async () => {
+  const { stdout, outputs } = await testGhAction(mainFilePath, {
+    event: {
+      commits: [{
+        message: 'Feat: add images'
+      }, {
+        message: 'Fix: fix bug about images'
+      }]
+    }
+  })
+  expect(stdout).toMatchSnapshot()
+  expect(outputs.increment).toBe('minor')
 })
 
 test('invalid commit message', async () => {

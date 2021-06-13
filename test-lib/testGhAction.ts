@@ -36,9 +36,13 @@ interface PrEvent {
   number: number
 }
 
+interface PushEvent {
+  commits: Commit[]
+}
+
 interface Options {
   inputs: Record<string, string>
-  event: PrEvent
+  event: PrEvent | PushEvent
   repo: Repo
   env: Record<string, string>
 }
@@ -80,11 +84,14 @@ const testGhAction = async (file: string, partialOptions: Partial<Options> = {})
 
   await Promise.all([
     writeFile(eventFile, {
-      pull_request: {
-        commits: repo.pullRequests[event.number].commits.length,
-        number: event.number,
-        labels: repo.pullRequests[event.number].labels
-      },
+      pull_request: 'number' in event
+        ? {
+            commits: repo.pullRequests[event.number].commits.length,
+            number: event.number,
+            labels: repo.pullRequests[event.number].labels
+          }
+        : undefined,
+      commits: 'commits' in event ? event.commits.map(commit => ({ commit })) : undefined,
       repository: {
         name: 'test-semver',
         owner: {

@@ -20,3 +20,13 @@ Largest increment: major
 ::set-output name=increment::major
 "
 `;
+
+exports[`push 1`] = `
+"Parsing commit messages
+Message: Feat: add images. Increment: minor.
+Message: Fix: fix bug about images. Increment: patch.
+Largest increment: minor
+
+::set-output name=increment::minor
+"
+`;
