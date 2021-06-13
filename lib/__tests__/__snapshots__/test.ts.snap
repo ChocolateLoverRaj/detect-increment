@@ -8,7 +8,7 @@ Messages should follow: <type>[optional scope]: <description>
 ]
 `;
 
-exports[`works 1`] = `
+exports[`pull request 1`] = `
 "Fetching 4 commits.
 Parsing commit messages
 Message: Feature: add triangles. Increment: minor.
@@ -16,11 +16,7 @@ Message: Breaking: replaced triangle with polygon. Increment: major.
 Message: Fix: polygons have minimum of 3 sides. Increment: patch.
 Message: Chore: updated GitHub action script. Increment: none.
 Largest increment: major
-Updating pull request labels
-Current increment labels: Semver Increment: Minor, Semver Increment: Patch
-Desired increment label: Semver Increment: Major
-Adding labels: Semver Increment: Major.
-Removing labels: Semver Increment: Minor, Semver Increment: Patch.
-Done!
+
+::set-output name=increment::major
 "
 `;

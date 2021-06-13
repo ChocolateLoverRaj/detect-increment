@@ -1,9 +1,9 @@
 name: GitHub Action
 description: Outputs a capitalized string of whatever the input string is.
 outputs:
-  str:
-    description: The input string capitalized
-    value: ${{ steps.main.outputs.str }}
+  increment:
+    description: Either 'major', 'minor', 'patch', or 'none'.
+    value: ${{ steps.main.outputs.increment }}
 runs:
   using: composite
   steps:
@@ -17,5 +17,3 @@ runs:
       run: pnpm start
       shell: bash
       working-directory: ${{ github.action_path }}
-      env:
-        INPUT_STR: ${{ inputs.str }}

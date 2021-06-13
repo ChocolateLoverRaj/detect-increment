@@ -4,8 +4,7 @@ import never from 'never'
 import { parse, plugins, applyPlugins } from 'parse-commit-message'
 import { getOctokit } from '@actions/github'
 import increments, { Increment } from './increments'
-import getLabelName from './getLabelName'
-import diff from 'arr-diff'
+import { setOutput } from '@actions/core'
 
 (async () => {
   const octokit = getOctokit(process.env.GITHUB_TOKEN ?? never('No GITHUB_TOKEN'), {
@@ -39,39 +38,7 @@ import diff from 'arr-diff'
     return increment === false ? 0 : increments.indexOf(increment)
   }))]
   console.log(`Largest increment: ${increment}`)
-  console.log('Updating pull request labels')
-  const incrementLabels = increments.map(v => getLabelName(v))
-  const labels = (event.pull_request.labels as Array<{ name: string}>)
-    .map(({ name }) => name)
-    .filter(name => incrementLabels.includes(name))
-  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-  console.log(`Current increment labels: ${labels.join(', ') || '*none*'}`)
-  const desiredLabel = getLabelName(increment)
-  const desiredLabels = [desiredLabel]
-  console.log(`Desired increment label: ${desiredLabel}`)
-  const addLabels = diff(desiredLabels, labels)
-  const removeLabels = diff(labels, desiredLabels)
-  if (!Boolean(addLabels.length + removeLabels.length)) {
-    console.log('Labels up to date. No changes necessary.')
-  } else {
-    if (Boolean(addLabels.length)) console.log(`Adding labels: ${addLabels.join(', ')}.`)
-    if (Boolean(removeLabels.length)) console.log(`Removing labels: ${removeLabels.join(', ')}.`)
-    await Promise.all([
-      octokit.rest.issues.addLabels({
-        repo: event.repository.name,
-        owner: event.repository.owner.login,
-        issue_number: event.pull_request.number,
-        labels: addLabels
-      }),
-      ...removeLabels.map(async name => await octokit.rest.issues.removeLabel({
-        repo: event.repository.name,
-        owner: event.repository.owner.login,
-        issue_number: event.pull_request.number,
-        name
-      }))
-    ])
-    console.log('Done!')
-  }
+  setOutput('increment', increment)
 })()
   .catch(e => {
     console.error(e.message)

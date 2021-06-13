@@ -14,15 +14,15 @@ interface Result {
   stdout: string
 }
 
-interface Commit {
+export interface Commit {
   message: string
 }
 
-interface Label {
+export interface Label {
   name: string
 }
 
-interface PullRequest {
+export interface PullRequest {
   commits: Commit[]
   labels: Label[]
 }
