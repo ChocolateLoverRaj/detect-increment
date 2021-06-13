@@ -10,6 +10,7 @@ import { setOutput } from '@actions/core'
   const eventFile = process.env.GITHUB_EVENT_PATH ?? never('No GITHUB_EVENT_PATH')
   const event = readFileSync(eventFile)
   let commits: Array<{ commit: { message: string} }>
+  console.log(event.commits)
   if (event.commits !== undefined) commits = event.commits
   else if (event.pull_request !== undefined) {
     const octokit = getOctokit(process.env.GITHUB_TOKEN ?? never('No GITHUB_TOKEN'), {
