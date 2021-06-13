@@ -9,8 +9,7 @@ import { setOutput } from '@actions/core'
 (async () => {
   const eventFile = process.env.GITHUB_EVENT_PATH ?? never('No GITHUB_EVENT_PATH')
   const event = readFileSync(eventFile)
-  let commits: Array<{ commit: { message: string} }>
-  console.log(event.commits)
+  let commits: Array<{ message: string }>
   if (event.commits !== undefined) commits = event.commits
   else if (event.pull_request !== undefined) {
     const octokit = getOctokit(process.env.GITHUB_TOKEN ?? never('No GITHUB_TOKEN'), {
@@ -21,12 +20,12 @@ import { setOutput } from '@actions/core'
       repo: event.repository.name,
       owner: event.repository.owner.login,
       pull_number: event.pull_request.number
-    })).data
+    })).data.map(({ commit }) => commit)
   } else {
     throw new Error('Cannot get commits for this event')
   }
   console.log('Parsing commit messages')
-  const increment = increments[Math.max(...commits.map(({ commit: { message } }) => {
+  const increment = increments[Math.max(...commits.map(({ message }) => {
     const messageHeader = message.split('\n')[0]
     let increment: Increment | false
     try {

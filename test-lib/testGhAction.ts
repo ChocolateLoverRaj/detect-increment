@@ -91,7 +91,7 @@ const testGhAction = async (file: string, partialOptions: Partial<Options> = {})
             labels: repo.pullRequests[event.number].labels
           }
         : undefined,
-      commits: 'commits' in event ? event.commits.map(commit => ({ commit })) : undefined,
+      commits: 'commits' in event ? event.commits : undefined,
       repository: {
         name: 'test-semver',
         owner: {
