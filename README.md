@@ -38,7 +38,9 @@ jobs:
         run_install: true
     - id: get_increment
       name: Get Increment
-      uses: ChocolateLoverRaj/detect-increment@main
+      uses: ChocolateLoverRaj/detect-increment@v1.0
     - run: echo ${{ steps.get_increment.outputs.increment }}
 ```
 The example above will echo the increment. The output can be used with other steps, like automatically releasing a new version of a package.
+
+Note that it says uses: `ChocolateLoverRaj/detect-increment@v1.0`. `v1.0` is a tag that will be updated to have the latest patch release. By using this tag, you can get a version with bug fixes without having to change any files. 
