@@ -6,6 +6,26 @@ import { getOctokit } from '@actions/github'
 import increments, { Increment } from './increments'
 import { setOutput } from '@actions/core'
 import PRMessageRegex from './PRMessageRegex'
+import mergeMessageRegex from './mergeMessageRegex'
+
+type Type = 'normal' | 'PRMerge' | 'merge'
+
+const getType = (message: string): Type => PRMessageRegex.test(message)
+  ? 'PRMerge'
+  : mergeMessageRegex.test(message)
+    ? 'merge'
+    : 'normal'
+
+const getExplanation = (type: Type): string => {
+  switch (type) {
+    case 'normal':
+      return ''
+    case 'PRMerge':
+      return ' (pull request merge commit)'
+    default:
+      return ' (merge commit)'
+  }
+}
 
 (async () => {
   const eventFile = process.env.GITHUB_EVENT_PATH ?? never('No GITHUB_EVENT_PATH')
@@ -29,9 +49,8 @@ import PRMessageRegex from './PRMessageRegex'
   const increment = increments[Math.max(...commits.map(({ message }) => {
     const messageHeader = message.split('\n')[0]
     let increment: Increment | false
-    const isPrMerge = PRMessageRegex.test(message)
-    if (isPrMerge) increment = 'none'
-    else {
+    const type = getType(message)
+    if (type === 'normal') {
       try {
         increment = applyPlugins(plugins[1], parse(message))[0].increment
       } catch (e) {
@@ -39,11 +58,13 @@ import PRMessageRegex from './PRMessageRegex'
         `Invalid Commit Message: ${messageHeader}\n` +
         `Messages should follow: ${(e as Error).message.split('\n')[1]}`)
       }
+    } else {
+      increment = 'none'
     }
     console.log(
       `Message: ${messageHeader}. ` +
       `Increment: ${increment === false ? 'none' : increment}` +
-      `${isPrMerge ? ' (pull request merge commit)' : ''}.`)
+      `${getExplanation(type)}.`)
     return increment === false ? 0 : increments.indexOf(increment)
   }))]
   console.log(`Largest increment: ${increment}`)

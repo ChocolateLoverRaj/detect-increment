@@ -10,6 +10,16 @@ Largest increment: minor
 "
 `;
 
+exports[`branch merge 1`] = `
+"Parsing commit messages
+Message: Merge branch 'main' into eslint-tsconfig-no-tests. Increment: none (merge commit).
+Message: Chore: CI stuff. Increment: none.
+Largest increment: none
+
+::set-output name=increment::none
+"
+`;
+
 exports[`invalid commit message 1`] = `
 [Error: Process exited with code 1
 Stderr is below:

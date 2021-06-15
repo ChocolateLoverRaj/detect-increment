@@ -62,6 +62,20 @@ test('PR merge', async () => {
   expect(outputs.increment).toBe('minor')
 })
 
+test('branch merge', async () => {
+  const { stdout, outputs } = await testGhAction(mainFilePath, {
+    event: {
+      commits: [{
+        message: "Merge branch 'main' into eslint-tsconfig-no-tests"
+      }, {
+        message: 'Chore: CI stuff'
+      }]
+    }
+  })
+  expect(stdout).toMatchSnapshot()
+  expect(outputs.increment).toBe('none')
+})
+
 test('invalid commit message', async () => {
   await expect(testGhAction(join(__dirname, '../../dist/index.js'), {
     event: {
