@@ -1,5 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`PR merge 1`] = `
+"Parsing commit messages
+Message: Merge pull request #24 from ChocolateLoverRaj/test-semver. Increment: none (pull request merge commit).
+Message: Feat: allow case insensitive words. Increment: minor.
+Largest increment: minor
+
+::set-output name=increment::minor
+"
+`;
+
 exports[`invalid commit message 1`] = `
 [Error: Process exited with code 1
 Stderr is below:

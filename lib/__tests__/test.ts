@@ -48,6 +48,20 @@ test('push', async () => {
   expect(outputs.increment).toBe('minor')
 })
 
+test('PR merge', async () => {
+  const { stdout, outputs } = await testGhAction(mainFilePath, {
+    event: {
+      commits: [{
+        message: 'Merge pull request #24 from ChocolateLoverRaj/test-semver'
+      }, {
+        message: 'Feat: allow case insensitive words'
+      }]
+    }
+  })
+  expect(stdout).toMatchSnapshot()
+  expect(outputs.increment).toBe('minor')
+})
+
 test('invalid commit message', async () => {
   await expect(testGhAction(join(__dirname, '../../dist/index.js'), {
     event: {

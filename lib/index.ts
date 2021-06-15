@@ -5,6 +5,7 @@ import { parse, plugins, applyPlugins } from 'parse-commit-message'
 import { getOctokit } from '@actions/github'
 import increments, { Increment } from './increments'
 import { setOutput } from '@actions/core'
+import PRMessageRegex from './PRMessageRegex'
 
 (async () => {
   const eventFile = process.env.GITHUB_EVENT_PATH ?? never('No GITHUB_EVENT_PATH')
@@ -28,16 +29,21 @@ import { setOutput } from '@actions/core'
   const increment = increments[Math.max(...commits.map(({ message }) => {
     const messageHeader = message.split('\n')[0]
     let increment: Increment | false
-    try {
-      increment = applyPlugins(plugins[1], parse(message))[0].increment
-    } catch (e) {
-      throw new Error(
+    const isPrMerge = PRMessageRegex.test(message)
+    if (isPrMerge) increment = 'none'
+    else {
+      try {
+        increment = applyPlugins(plugins[1], parse(message))[0].increment
+      } catch (e) {
+        throw new Error(
         `Invalid Commit Message: ${messageHeader}\n` +
         `Messages should follow: ${(e as Error).message.split('\n')[1]}`)
+      }
     }
     console.log(
       `Message: ${messageHeader}. ` +
-      `Increment: ${increment === false ? 'none' : increment}.`)
+      `Increment: ${increment === false ? 'none' : increment}` +
+      `${isPrMerge ? ' (pull request merge commit)' : ''}.`)
     return increment === false ? 0 : increments.indexOf(increment)
   }))]
   console.log(`Largest increment: ${increment}`)
