@@ -4,6 +4,9 @@ outputs:
   increment:
     description: Either 'major', 'minor', 'patch', or 'none'.
     value: ${{ steps.main.outputs.increment }}
+  increments_by_scope:
+    description: A json string of increments where the keys are the scope and the values are their increments.
+    value: ${{ steps.main.outputs.increments_by_scope }}
 runs:
   using: composite
   steps:

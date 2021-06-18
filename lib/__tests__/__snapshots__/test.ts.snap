@@ -2,21 +2,25 @@
 
 exports[`PR merge 1`] = `
 "Parsing commit messages
-Message: Merge pull request #24 from ChocolateLoverRaj/test-semver. Increment: none (pull request merge commit).
-Message: Feat: allow case insensitive words. Increment: minor.
-Largest increment: minor
+Message: Merge pull request #24 from ChocolateLoverRaj/test-semver. Increment: none (pull request merge commit). Scopes: *none*.
+Message: Feat: allow case insensitive words. Increment: minor. Scopes: *none*.
 
 ::set-output name=increment::minor
+
+::set-output name=increments_by_scope::{}
+Largest increment: minor
 "
 `;
 
 exports[`branch merge 1`] = `
 "Parsing commit messages
-Message: Merge branch 'main' into eslint-tsconfig-no-tests. Increment: none (merge commit).
-Message: Chore: CI stuff. Increment: none.
-Largest increment: none
+Message: Merge branch 'main' into eslint-tsconfig-no-tests. Increment: none (merge commit). Scopes: *none*.
+Message: Chore: CI stuff. Increment: none. Scopes: *none*.
 
 ::set-output name=increment::none
+
+::set-output name=increments_by_scope::{}
+Largest increment: none
 "
 `;
 
@@ -31,22 +35,38 @@ Messages should follow: <type>[optional scope]: <description>
 exports[`pull request 1`] = `
 "Fetching 4 commits.
 Parsing commit messages
-Message: Feature: add triangles. Increment: minor.
-Message: Breaking: replaced triangle with polygon. Increment: major.
-Message: Fix: polygons have minimum of 3 sides. Increment: patch.
-Message: Chore: updated GitHub action script. Increment: none.
-Largest increment: major
+Message: Feature: add triangles. Increment: minor. Scopes: *none*.
+Message: Breaking: replaced triangle with polygon. Increment: major. Scopes: *none*.
+Message: Fix: polygons have minimum of 3 sides. Increment: patch. Scopes: *none*.
+Message: Chore: updated GitHub action script. Increment: none. Scopes: *none*.
 
 ::set-output name=increment::major
+
+::set-output name=increments_by_scope::{}
+Largest increment: major
 "
 `;
 
 exports[`push 1`] = `
 "Parsing commit messages
-Message: Feat: add images. Increment: minor.
-Message: Fix: fix bug about images. Increment: patch.
-Largest increment: minor
+Message: Feat: add images. Increment: minor. Scopes: *none*.
+Message: Fix: fix bug about images. Increment: patch. Scopes: *none*.
 
 ::set-output name=increment::minor
+
+::set-output name=increments_by_scope::{}
+Largest increment: minor
+"
+`;
+
+exports[`scoped commits 1`] = `
+"Parsing commit messages
+Message: breaking(react-json-input, antd): drop node 10 support. Increment: major. Scopes: react-json-input, antd.
+
+::set-output name=increment::major
+
+::set-output name=increments_by_scope::{\\"react-json-input\\":\\"major\\",\\"antd\\":\\"major\\"}
+Largest increment for scope 'react-json-input': major
+Largest increment for scope 'antd': major
 "
 `;

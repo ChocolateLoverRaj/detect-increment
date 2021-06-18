@@ -23,6 +23,9 @@ This variable is needed for getting commits of a pull request. If running on the
 #### `increment`
 Will be either `none`, `patch`, `minor`, or `major`.
 
+#### `increments_by_scope`
+Will be a JSON object where the keys are the scopes, and the values are the increments.
+
 ## Examples
 ```yaml
 # ...
@@ -39,7 +42,9 @@ jobs:
     - id: get_increment
       name: Get Increment
       uses: ChocolateLoverRaj/detect-increment@v1.2
-    - run: echo ${{ steps.get_increment.outputs.increment }}
+    - run: |
+        echo ${{ steps.get_increment.outputs.increment }}
+        echo ${{ steps.get_increment.outputs.increments_by_scopes }}
 ```
 The example above will echo the increment. The output can be used with other steps, like automatically releasing a new version of a package.
 

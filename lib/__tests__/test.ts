@@ -94,3 +94,18 @@ test('invalid commit message', async () => {
     }
   })).rejects.toMatchSnapshot()
 })
+
+test('scoped commits', async () => {
+  const { outputs, stdout } = await testGhAction(mainFilePath, {
+    event: {
+      commits: [{
+        message: 'breaking(react-json-input, antd): drop node 10 support'
+      }]
+    }
+  })
+  expect(outputs).toEqual({
+    increment: 'major',
+    increments_by_scope: JSON.stringify({ 'react-json-input': 'major', antd: 'major' })
+  })
+  expect(stdout).toMatchSnapshot()
+})

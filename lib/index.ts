@@ -3,10 +3,13 @@ import { readFileSync } from 'jsonfile'
 import never from 'never'
 import { parse, plugins, applyPlugins } from 'parse-commit-message'
 import { getOctokit } from '@actions/github'
-import increments, { Increment } from './increments'
+import { Increment } from './increments'
 import { setOutput } from '@actions/core'
 import PRMessageRegex from './PRMessageRegex'
 import mergeMessageRegex from './mergeMessageRegex'
+import listToStr from './listToStr'
+import { ParsedCommit } from './parsedCommit'
+import getLargestIncrement from './getLargestIncrement'
 
 type Type = 'normal' | 'PRMerge' | 'merge'
 
@@ -46,13 +49,18 @@ const getExplanation = (type: Type): string => {
     throw new Error('Cannot get commits for this event')
   }
   console.log('Parsing commit messages')
-  const increment = increments[Math.max(...commits.map(({ message }) => {
+  const parsedCommits = commits.map<ParsedCommit>(({ message }) => {
     const messageHeader = message.split('\n')[0]
     let increment: Increment | false
+    let scopes: string[] = []
     const type = getType(message)
     if (type === 'normal') {
       try {
-        increment = applyPlugins(plugins[1], parse(message))[0].increment
+        const commit = applyPlugins(plugins[1], parse(message))[0]
+        increment = commit.increment
+        if (typeof commit.header.scope === 'string') {
+          scopes = (commit.header.scope as string).split(',').map(scope => scope.trim())
+        }
       } catch (e) {
         throw new Error(
         `Invalid Commit Message: ${messageHeader}\n` +
@@ -64,11 +72,28 @@ const getExplanation = (type: Type): string => {
     console.log(
       `Message: ${messageHeader}. ` +
       `Increment: ${increment === false ? 'none' : increment}` +
-      `${getExplanation(type)}.`)
-    return increment === false ? 0 : increments.indexOf(increment)
-  }))]
-  console.log(`Largest increment: ${increment}`)
+      `${getExplanation(type)}. ` +
+      `Scopes: ${listToStr(scopes)}.`)
+    return {
+      increment: increment === false ? 'none' : increment,
+      scopes
+    }
+  })
+  const allScopes = [...new Set(parsedCommits.flatMap(({ scopes }) => scopes))]
+  const incrementsByScope = allScopes.map(scope => {
+    const largestIncrement = getLargestIncrement(parsedCommits.filter(({ scopes }) => scopes.includes(scope)))
+    return [scope, largestIncrement]
+  })
+  const increment = getLargestIncrement(parsedCommits)
   setOutput('increment', increment)
+  setOutput('increments_by_scope', JSON.stringify(Object.fromEntries(incrementsByScope)))
+  if (allScopes.length > 0) {
+    incrementsByScope.forEach(([scope, increment]) => {
+      console.log(`Largest increment for scope '${scope}': ${increment}`)
+    })
+  } else {
+    console.log(`Largest increment: ${increment}`)
+  }
 })()
   .catch(e => {
     console.error(e.message)
